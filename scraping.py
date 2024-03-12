@@ -4,6 +4,7 @@ import pandas as pd
 import re
 import geopandas as gpd
 import gpxpy
+import time
 
 def parse_liste_col(url):
     url_root = "https://www.cols-cyclisme.com"
@@ -34,6 +35,7 @@ def parse_liste_col(url):
         # Append the GPX data to the row
         data_row.append(gpx_file_location)
         data_rows.append(data_row)
+        time.sleep(1)
 
     # Adjust the headers to include the 'GPX' column
     headers.append("GPX")
@@ -76,15 +78,14 @@ def extract_info_col(
     return df_col
 
 
-import gpxpy
 
 
 def get_gpx_from_url(url):
     filename = url.rsplit("/", maxsplit=1)[-1]
-    with open(f"gpx/{filename}", "wb") as f:
+    with open(f"./gpx/{filename}", "wb") as f:
         f.write(requests.get(url).content)
 
-    gpx_file = open(f"{filename}.gpx", "r")
+    gpx_file = open(f"./gpx/{filename}", "r")
     gpx = gpxpy.parse(gpx_file)
 
     points = gpx.tracks[0].segments[0].points

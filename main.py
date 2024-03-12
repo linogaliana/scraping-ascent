@@ -15,8 +15,8 @@ url_table_page = 'https://www.cols-cyclisme.com/alpes-du-nord/liste-r1.htm'
 
 
 # Parse the list of cols and get the DataFrame
-#df = parse_liste_col(url_table_page)
-#df.to_parquet("liste.parquet")
+df = parse_liste_col(url_table_page)
+df.to_parquet("liste.parquet")
 
 
 df = pd.read_parquet("liste.parquet")
@@ -32,11 +32,13 @@ Path("/gpx").mkdir(parents=True, exist_ok=True)
 for index, row in df.head(10).iterrows():
     col_url = row['href']
     col_info_df = extract_info_col(col_url, id=index)
-    col_info_df['url'] = df['GPX']
+    col_info_df['url'] = row['GPX']
     trace = get_gpx_from_url(row['GPX'])
     details_df = pd.concat([details_df, col_info_df], ignore_index=True)
     traces = pd.concat([traces, trace])
     time.sleep(1)  # Sleep for 1 second between requests
 
 
-essai = traces.merge(details_df, on="url")
+from shapely.geometry import LineString
+traces_lines = traces.groupby('url')['geometry'].apply(lambda x: LineString(x.tolist()))
+essai = traces_lines.reset_index().merge(details_df, on="url")
