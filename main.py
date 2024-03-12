@@ -1,3 +1,4 @@
+from pathlib import Path
 import time
 import pandas as pd
 import geopandas as gpd
@@ -7,6 +8,7 @@ from scraping import (
     extract_info_col,
     get_gpx_from_url
 )
+
 
 # Fetch the webpage content
 url_table_page = 'https://www.cols-cyclisme.com/alpes-du-nord/liste-r1.htm'
@@ -22,6 +24,9 @@ df = pd.read_parquet("liste.parquet")
 # Initialize an empty DataFrame to hold all details
 details_df = pd.DataFrame()
 traces = gpd.GeoDataFrame()
+
+Path("/gpx").mkdir(parents=True, exist_ok=True)
+
 
 # Iterate over each row in the DataFrame
 for index, row in df.head(10).iterrows():

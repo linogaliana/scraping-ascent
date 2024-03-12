@@ -81,7 +81,7 @@ import gpxpy
 
 def get_gpx_from_url(url):
     filename = url.rsplit("/", maxsplit=1)[-1]
-    with open(f"{filename}.gpx", "wb") as f:
+    with open(f"gpx/{filename}", "wb") as f:
         f.write(requests.get(url).content)
 
     gpx_file = open(f"{filename}.gpx", "r")
