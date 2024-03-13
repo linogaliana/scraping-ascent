@@ -80,10 +80,11 @@ def extract_info_col(
 
 
 def create_geojson_from_gpx():
-    files = glob.glob("../gpx/*.gpx")
+    files = glob.glob("./gpx/*.gpx")
     geojsons = [gpx_to_geojson(fl) for fl in files]
     geojsons = pd.concat(geojsons)
-    return geojsons   
+    return geojsons 
+
 
 def gpx_to_geojson(filepath):
     gpx_file = open(filepath, "r")
@@ -125,3 +126,11 @@ def get_gpx_from_url(url):
     gdf["url"] = url
     gdf = gdf.drop(["lon", "lat"], axis="columns")
     return gdf
+
+
+def get_max_altitude_rows(
+    geojsons, group="url", altitude="alt"
+):
+    max_alt_rows = geojsons.groupby(group)[altitude].idxmax()
+    df_max_alt = geojsons.loc[max_alt_rows]
+    return df_max_alt
