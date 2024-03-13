@@ -79,7 +79,6 @@ def extract_info_col(
 
 
 
-
 def get_gpx_from_url(url):
     filename = url.rsplit("/", maxsplit=1)[-1]
     with open(f"./gpx/{filename}", "wb") as f:
