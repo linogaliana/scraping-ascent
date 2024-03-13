@@ -1,3 +1,4 @@
+import glob
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -77,6 +78,30 @@ def extract_info_col(
     df_col.columns = df_col.columns.str.replace(":", "").str.strip()
     return df_col
 
+
+def create_geojson_from_gpx():
+    files = glob.glob("../gpx/*.gpx")
+    geojsons = [gpx_to_geojson(fl) for fl in files]
+    geojsons = pd.concat(geojsons)
+    return geojsons   
+
+def gpx_to_geojson(filepath):
+    gpx_file = open(filepath, "r")
+    gpx = gpxpy.parse(gpx_file)
+
+    points = gpx.tracks[0].segments[0].points
+
+    longitude = [point.longitude for point in points]
+    latitude = [point.latitude for point in points]
+    altitude = [point.elevation for point in points]
+
+    df = pd.DataFrame({"lon": longitude, "lat": latitude, "alt": altitude})
+    gdf = gpd.GeoDataFrame(
+        df, geometry=gpd.points_from_xy(df.lon, df.lat), crs="EPSG:4326"
+    )
+    gdf["url"] = filepath.rsplit("/", maxsplit=1)[1]
+    gdf = gdf.drop(["lon", "lat"], axis="columns")
+    return gdf
 
 
 def get_gpx_from_url(url):
