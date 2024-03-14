@@ -16,7 +16,11 @@ url_table_page = 'https://www.cols-cyclisme.com/alpes-du-nord/liste-r1.htm'
 
 # Parse the list of cols and get the DataFrame
 df = parse_liste_col(url_table_page)
-df.to_parquet("liste.parquet")
+
+details = [extract_info_col(df['href'][i],df['GPX'][i]) for i in range(len(df))]
+details = pd.concat(details)
+
+details.to_parquet("liste.parquet")
 
 
 
