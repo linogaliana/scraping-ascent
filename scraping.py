@@ -131,6 +131,7 @@ def get_gpx_from_url(url):
 def get_max_altitude_rows(
     geojsons, group="url", altitude="alt"
 ):
-    max_alt_rows = geojsons.groupby(group)[altitude].idxmax()
-    df_max_alt = geojsons.loc[max_alt_rows]
+    df_max_alt = geojsons.sort_values(altitude, ascending=False).drop_duplicates(group)
     return df_max_alt
+
+
