@@ -7,6 +7,7 @@ import geopandas as gpd
 import gpxpy
 import time
 
+
 def parse_liste_col(url):
     url_root = "https://www.cols-cyclisme.com"
     response = requests.get(url)
@@ -83,7 +84,7 @@ def create_geojson_from_gpx():
     files = glob.glob("./gpx/*.gpx")
     geojsons = [gpx_to_geojson(fl) for fl in files]
     geojsons = pd.concat(geojsons)
-    return geojsons 
+    return geojsons
 
 
 def gpx_to_geojson(filepath):
@@ -133,5 +134,3 @@ def get_max_altitude_rows(
 ):
     df_max_alt = geojsons.sort_values(altitude, ascending=False).drop_duplicates(group)
     return df_max_alt
-
-
