@@ -80,14 +80,14 @@ def extract_info_col(
     return df_col
 
 
-def create_geojson_from_gpx():
+def create_geojson_from_gpx(three_dim=False):
     files = glob.glob("./gpx/*.gpx")
-    geojsons = [gpx_to_geojson(fl) for fl in files]
+    geojsons = [gpx_to_geojson(fl, three_dim=three_dim) for fl in files]
     geojsons = pd.concat(geojsons)
     return geojsons
 
 
-def gpx_to_geojson(filepath):
+def gpx_to_geojson(filepath, three_dim=False):
     gpx_file = open(filepath, "r")
     gpx = gpxpy.parse(gpx_file)
 
@@ -97,9 +97,13 @@ def gpx_to_geojson(filepath):
     latitude = [point.latitude for point in points]
     altitude = [point.elevation for point in points]
 
+    z = None
     df = pd.DataFrame({"lon": longitude, "lat": latitude, "alt": altitude})
+    if three_dim is True:
+        z = df.alt
+
     gdf = gpd.GeoDataFrame(
-        df, geometry=gpd.points_from_xy(df.lon, df.lat), crs="EPSG:4326"
+        df, geometry=gpd.points_from_xy(df.lon, df.lat, z=z), crs="EPSG:4326"
     )
     gdf["url"] = filepath.rsplit("/", maxsplit=1)[1]
     gdf = gdf.drop(["lon", "lat"], axis="columns")

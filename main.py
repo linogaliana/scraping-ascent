@@ -85,12 +85,20 @@ df_max_alt[columns_to_sanitize] = (
 df_max_alt['vtt'] = (
     df_max_alt['vtt'] == "ATTENTION : cette ascension nécéssite l'utilisation d'un VTT"
 )
-df_max_alt['ouverture'] = df_max_alt.drop("Ouverture", axis="columns")
+df_max_alt = df_max_alt.drop("ouverture", axis="columns")
+df_max_alt["category"] = pd.cut(
+    df_max_alt["denivellation"],
+    right=False,
+    bins=[80, 160, 320, 640, 800, float("inf")], 
+    labels=["Cat 4", "Cat 3", "Cat 2", "Cat 1", "HC"]
+)
+df_max_alt["category"] = df_max_alt["category"].astype(str)
 df_max_alt.to_file("alpes-nord-sommets.geojson")
 
 
 # Create routes ----------------------------------
-routes = gpd.read_file("data/routes.geojson")
+
+routes = create_geojson_from_gpx(three_dim=True)
 
 # Split the routes geodataframe by 'url' column values
 split_routes = routes.groupby("url")

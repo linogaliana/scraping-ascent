@@ -11,4 +11,4 @@ mc anonymous set download s3/lgaliana/cyclisme/data/geojson/split/
 
 # apres retrieve.py
 # mc cp liste.parquet s3/lgaliana/cyclisme/liste.parquet
-mc cp alpes-nord-sommets.geojson s3/lgaliana/cyclisme/data/geojson/alpes-nord-sommets.geojson
+# mc cp alpes-nord-sommets.geojson s3/lgaliana/cyclisme/data/geojson/alpes-nord-sommets.geojson
