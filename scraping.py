@@ -8,7 +8,7 @@ import gpxpy
 import time
 
 
-def parse_liste_col(url):
+def parse_liste_col(url, verbose = False):
     url_root = "https://www.cols-cyclisme.com"
     response = requests.get(url)
     webpage = response.content
@@ -18,21 +18,36 @@ def parse_liste_col(url):
     headers = ["href"] + [th.text.strip() for th in table.find_all("th")]
     data_rows = []
 
+    i = 0
+
     for row in table.find_all("tr")[1:]:  # skip the header row
         onclick_attr = row.get("onclick", "")
         href = onclick_attr.split("'")[1] if onclick_attr else None
+        if verbose:
+            print(href)
+            print(i)
         cols = row.find_all("td")
         data_row = [url_root + href] + [col.text.strip() for col in cols]
 
         # Fetch the GPX data for the climb
-        climb_page_response = requests.get(url_root + href)
-        climb_soup = BeautifulSoup(climb_page_response.content, "html.parser")
-        script_tag = climb_soup.find("script", text=re.compile("var gpx"))
-        gpx_file_location = (
-            re.search("var gpx = '(.+?)';", script_tag.string).group(1)
-            if script_tag
-            else None
-        )
+        try:
+            climb_page_response = requests.get(url_root + href)
+            climb_soup = BeautifulSoup(climb_page_response.content, "html.parser")
+            script_tag = climb_soup.find("script", text=re.compile("var gpx"))
+            gpx_extract = re.search("var gpx = '(.+?)';", script_tag.string)
+            if gpx_extract is None:
+                gpx_file_location = None
+            else:
+                gpx_file_location = gpx_extract.group(1)
+        except requests.exceptions.RequestException as e:
+            print(f"Error fetching GPX data for row {i}: {e}")
+            # Store the index of the row with the error for later retry
+            # You can add your own error handling logic here
+            # For example, you can append the index to a list and try again later
+            # retry_list.append(i)
+            continue
+        
+        i += 1
 
         # Append the GPX data to the row
         data_row.append(gpx_file_location)

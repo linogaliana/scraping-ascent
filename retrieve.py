@@ -11,28 +11,39 @@ from scraping import (
 
 
 # Fetch the webpage content
-url_table_page = 'https://www.cols-cyclisme.com/alpes-du-nord/liste-r1.htm'
+# url_table_page = 'https://www.cols-cyclisme.com/alpes-du-nord/liste-r1.htm'
+url_table_page = 'https://www.cols-cyclisme.com/alpes-du-sud/liste-r2.htm'
 
+def retrieve_save_details(url_table_page):
+    filename = (
+        url_table_page
+        .rsplit("/", maxsplit=1)[1]
+        .split(".")[0]
+    )
+    filename = f"{filename}.parquet"
 
-# Parse the list of cols and get the DataFrame
-df = parse_liste_col(url_table_page)
+    # Parse the list of cols and get the DataFrame
+    df = parse_liste_col(url_table_page)
 
-details = [extract_info_col(df['href'][i], df['GPX'][i]) for i in range(len(df))]
-details_augmented = pd.concat(details)
-details_augmented = details_augmented.merge(
-    df.loc[:, ['GPX', 'href']],
-    left_on="id", right_on="GPX").drop("GPX", axis="columns")
-details_augmented.to_parquet("liste.parquet")
+    details = [extract_info_col(df['href'][i], df['GPX'][i]) for i in range(len(df))]
+    details_augmented = pd.concat(details)
+    details_augmented = details_augmented.merge(
+        df.loc[:, ['GPX', 'href']],
+        left_on="id", right_on="GPX").drop("GPX", axis="columns")
+    details_augmented.to_parquet(filename)
+    return details_augmented
+
+details_augmented = retrieve_save_details(url_table_page)
 
 # Initialize an empty DataFrame to hold all details
 details_df = pd.DataFrame()
 traces = gpd.GeoDataFrame()
 
-Path("/gpx").mkdir(parents=True, exist_ok=True)
+Path("./gpx").mkdir(parents=True, exist_ok=True)
 
 
 # Iterate over each row in the DataFrame
-for index, row in df.head(10).iterrows():
+for index, row in details_augmented.head(10).iterrows():
     col_url = row['href']
     col_info_df = extract_info_col(col_url, id=index)
     col_info_df['url'] = row['GPX']
