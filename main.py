@@ -14,7 +14,7 @@ os.makedirs("images", exist_ok=True)
 os.makedirs("data/derived/", exist_ok=True)
 
 
-df = pd.read_parquet("liste.parquet")
+df = pd.read_parquet("data/liste.parquet")
 df["url"] = df["id"]
 df["id"] = df["url"].str.rsplit("/").str[-1].str.replace(".gpx", "")
 
