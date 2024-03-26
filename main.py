@@ -33,6 +33,7 @@ for url in df["Profil Image URL"]:
         if os.path.exists(f"images/{filename}"):
             print(f"Image already exists: {filename}")
         else:
+            time.sleep(1)
             # Send a GET request to download the image
             response = requests.get(url)
 
@@ -46,11 +47,12 @@ for url in df["Profil Image URL"]:
                 print(f"Failed to download image: {filename}")
     else:
         print("Profil Image URL is not available.")
-    time.sleep(0.5)
 
 
 # ---------------------------------------
 # create geojson for climbing ascent
+
+filename_summits = "alpes-sud-sommets.geojson"
 
 geojsons = create_geojson_from_gpx()
 df_max_alt = get_max_altitude_rows(geojsons)
@@ -94,7 +96,7 @@ df_max_alt["category"] = pd.cut(
     labels=["Cat 4", "Cat 3", "Cat 2", "Cat 1", "HC"]
 )
 df_max_alt["category"] = df_max_alt["category"].astype(str)
-df_max_alt.to_file("alpes-nord-sommets.geojson")
+df_max_alt.to_file(filename_summits)
 
 
 # Create routes ----------------------------------

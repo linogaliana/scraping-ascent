@@ -6,7 +6,7 @@ import re
 import geopandas as gpd
 import gpxpy
 import time
-
+from pathlib import Path
 
 def parse_liste_col(url, verbose = False):
     url_root = "https://www.cols-cyclisme.com"
@@ -126,26 +126,34 @@ def gpx_to_geojson(filepath, three_dim=False):
 
 
 def get_gpx_from_url(url):
-    filename = url.rsplit("/", maxsplit=1)[-1]
-    with open(f"./gpx/{filename}", "wb") as f:
-        f.write(requests.get(url).content)
+    if url is not None:
 
-    gpx_file = open(f"./gpx/{filename}", "r")
-    gpx = gpxpy.parse(gpx_file)
+        filename = url.rsplit("/", maxsplit=1)[-1]
+        local_path = f"./gpx/{filename}"
 
-    points = gpx.tracks[0].segments[0].points
+        checkgpx = Path(local_path)
+        
+        if checkgpx.is_file() is False:
 
-    longitude = [point.longitude for point in points]
-    latitude = [point.latitude for point in points]
-    altitude = [point.elevation for point in points]
+            with open(local_path, "wb") as f:
+                f.write(requests.get(url).content)
 
-    df = pd.DataFrame({"lon": longitude, "lat": latitude, "alt": altitude})
-    gdf = gpd.GeoDataFrame(
-        df, geometry=gpd.points_from_xy(df.lon, df.lat), crs="EPSG:4326"
-    )
-    gdf["url"] = url
-    gdf = gdf.drop(["lon", "lat"], axis="columns")
-    return gdf
+            gpx_file = open(f"./gpx/{filename}", "r")
+            gpx = gpxpy.parse(gpx_file)
+
+            points = gpx.tracks[0].segments[0].points
+
+            longitude = [point.longitude for point in points]
+            latitude = [point.latitude for point in points]
+            altitude = [point.elevation for point in points]
+
+            df = pd.DataFrame({"lon": longitude, "lat": latitude, "alt": altitude})
+            gdf = gpd.GeoDataFrame(
+                df, geometry=gpd.points_from_xy(df.lon, df.lat), crs="EPSG:4326"
+            )
+            gdf["url"] = url
+            gdf = gdf.drop(["lon", "lat"], axis="columns")
+            return gdf
 
 
 def get_max_altitude_rows(
