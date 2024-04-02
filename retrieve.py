@@ -12,7 +12,8 @@ from scraping import (
 
 # Fetch the webpage content
 # url_table_page = 'https://www.cols-cyclisme.com/alpes-du-nord/liste-r1.htm'
-url_table_page = 'https://www.cols-cyclisme.com/alpes-du-sud/liste-r2.htm'
+# url_table_page = 'https://www.cols-cyclisme.com/alpes-du-sud/liste-r2.htm'
+url_table_page = 'https://www.cols-cyclisme.com/pyrenees/liste-r3.htm'
 
 def retrieve_save_details(url_table_page):
     filename = (
