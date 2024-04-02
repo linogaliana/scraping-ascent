@@ -13,8 +13,9 @@ from scraping import create_geojson_from_gpx, get_max_altitude_rows
 os.makedirs("images", exist_ok=True)
 os.makedirs("data/derived/", exist_ok=True)
 
+input_file = "liste-r3.parquet"
 
-df = pd.read_parquet("liste-r2.parquet")
+df = pd.read_parquet(input_file)
 
 df["url"] = df["id"]
 df["id"] = df["url"].str.rsplit("/").str[-1].str.replace(".gpx", "")
@@ -52,7 +53,7 @@ for url in df["Profil Image URL"]:
 # ---------------------------------------
 # create geojson for climbing ascent
 
-filename_summits = "alpes-sud-sommets.geojson"
+filename_summits = "pyrenees.geojson"
 
 geojsons = create_geojson_from_gpx()
 df_max_alt = get_max_altitude_rows(geojsons)

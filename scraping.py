@@ -103,58 +103,72 @@ def create_geojson_from_gpx(three_dim=False):
 
 
 def gpx_to_geojson(filepath, three_dim=False):
-    gpx_file = open(filepath, "r")
-    gpx = gpxpy.parse(gpx_file)
 
-    points = gpx.tracks[0].segments[0].points
+    try:
+        gpx_file = open(filepath, "r")
+        gpx = gpxpy.parse(gpx_file)
+        try:
+            # Try to access points from tracks
+            points = gpx.tracks[0].segments[0].points
+        except (IndexError, AttributeError):
+            # If there's an error, fallback to routes
+            points = gpx.routes[0].points
 
-    longitude = [point.longitude for point in points]
-    latitude = [point.latitude for point in points]
-    altitude = [point.elevation for point in points]
+        longitude = [point.longitude for point in points]
+        latitude = [point.latitude for point in points]
+        altitude = [point.elevation for point in points]
 
-    z = None
-    df = pd.DataFrame({"lon": longitude, "lat": latitude, "alt": altitude})
-    if three_dim is True:
-        z = df.alt
+        z = None
+        df = pd.DataFrame({"lon": longitude, "lat": latitude, "alt": altitude})
+        if three_dim is True:
+            z = df.alt
 
-    gdf = gpd.GeoDataFrame(
-        df, geometry=gpd.points_from_xy(df.lon, df.lat, z=z), crs="EPSG:4326"
-    )
-    gdf["url"] = filepath.rsplit("/", maxsplit=1)[1]
-    gdf = gdf.drop(["lon", "lat"], axis="columns")
+        gdf = gpd.GeoDataFrame(
+            df, geometry=gpd.points_from_xy(df.lon, df.lat, z=z), crs="EPSG:4326"
+        )
+        gdf["url"] = filepath.rsplit("/", maxsplit=1)[1]
+        gdf = gdf.drop(["lon", "lat"], axis="columns")
+    except Exception as e:
+        return None
     return gdf
 
 
 def get_gpx_from_url(url):
     if url is not None:
-
         filename = url.rsplit("/", maxsplit=1)[-1]
         local_path = f"./gpx/{filename}"
 
         checkgpx = Path(local_path)
         
-        if checkgpx.is_file() is False:
-
+        if not checkgpx.is_file():
             with open(local_path, "wb") as f:
                 f.write(requests.get(url).content)
 
-            gpx_file = open(f"./gpx/{filename}", "r")
-            gpx = gpxpy.parse(gpx_file)
+            try:
+                with open(local_path, "r") as gpx_file:
+                    gpx = gpxpy.parse(gpx_file)
 
-            points = gpx.tracks[0].segments[0].points
+                    try:
+                        # Try to access points from tracks
+                        points = gpx.tracks[0].segments[0].points
+                    except (IndexError, AttributeError):
+                        # If there's an error, fallback to routes
+                        points = gpx.routes[0].points
 
-            longitude = [point.longitude for point in points]
-            latitude = [point.latitude for point in points]
-            altitude = [point.elevation for point in points]
+                    longitude = [point.longitude for point in points]
+                    latitude = [point.latitude for point in points]
+                    altitude = [point.elevation for point in points]
 
-            df = pd.DataFrame({"lon": longitude, "lat": latitude, "alt": altitude})
-            gdf = gpd.GeoDataFrame(
-                df, geometry=gpd.points_from_xy(df.lon, df.lat), crs="EPSG:4326"
-            )
-            gdf["url"] = url
-            gdf = gdf.drop(["lon", "lat"], axis="columns")
-            return gdf
-
+                    df = pd.DataFrame({"lon": longitude, "lat": latitude, "alt": altitude})
+                    gdf = gpd.GeoDataFrame(
+                        df, geometry=gpd.points_from_xy(df.lon, df.lat), crs="EPSG:4326"
+                    )
+                    gdf["url"] = url
+                    gdf = gdf.drop(["lon", "lat"], axis=1)
+                    return gdf
+            except Exception as e:
+                # Handle corrupted GPX or parsing error by returning None
+                return None
 
 def get_max_altitude_rows(
     geojsons, group="url", altitude="alt"

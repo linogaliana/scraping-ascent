@@ -42,13 +42,20 @@ traces = gpd.GeoDataFrame()
 
 Path("./gpx").mkdir(parents=True, exist_ok=True)
 
+#details_df_old = pd.DataFrame()
+#traces_old = gpd.GeoDataFrame()
+details_df_old = pd.DataFrame()
+details_df = pd.DataFrame()
+traces = gpd.GeoDataFrame()
 
 # Iterate over each row in the DataFrame
-for index, row in details_augmented.head(10).iterrows():
-    col_url = row['href']
-    col_info_df = extract_info_col(col_url, id=index)
-    col_info_df['url'] = row['GPX']
-    trace = get_gpx_from_url(row['GPX'])
-    details_df = pd.concat([details_df, col_info_df], ignore_index=True)
-    traces = pd.concat([traces, trace])
-    time.sleep(1)  # Sleep for 1 second between requests
+for index, row in details_augmented.iterrows():
+    if pd.notnull(row['id']) # and row['id'] not in details_df_old['url'].tolist():
+        print(f"{index}, {row['id']}")
+        col_url = row['href']
+        col_info_df = extract_info_col(col_url, id=index)
+        col_info_df['url'] = row['id']
+        trace = get_gpx_from_url(row['id'])
+        details_df = pd.concat([details_df, col_info_df], ignore_index=True)
+        traces = pd.concat([traces, trace])
+        time.sleep(1)  # Sleep for 1 second between requests
