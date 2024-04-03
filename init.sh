@@ -10,8 +10,8 @@ mc anonymous set download s3/lgaliana/cyclisme/data/images
 mc anonymous set download s3/lgaliana/cyclisme/data/geojson/split/
 
 # apres retrieve.py
-# mc cp liste-r2.parquet s3/lgaliana/cyclisme/liste-r2.parquet
-# mc cp alpes-sud-sommets.geojson s3/lgaliana/cyclisme/data/geojson/alpes-sud-sommets.geojson
-# cp data/derived data/split
-# mc cp data/derived s3/lgaliana/cyclisme/data/geojson/ --recursive
-mc cp images/ s3/lgaliana/cyclisme/data/images --recursive
+# mc cp liste-r6.parquet s3/lgaliana/cyclisme/liste-r6.parquet
+# mc cp autres-massifs.geojson s3/lgaliana/cyclisme/data/geojson/autres-massifs.geojson
+# cp data/derived data/split -r
+# mc cp data/split s3/lgaliana/cyclisme/data/geojson/ --recursive
+# mc cp images/ s3/lgaliana/cyclisme/data/images --recursive

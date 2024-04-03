@@ -13,7 +13,7 @@ from scraping import (
 # Fetch the webpage content
 # url_table_page = 'https://www.cols-cyclisme.com/alpes-du-nord/liste-r1.htm'
 # url_table_page = 'https://www.cols-cyclisme.com/alpes-du-sud/liste-r2.htm'
-url_table_page = 'https://www.cols-cyclisme.com/pyrenees/liste-r3.htm'
+url_table_page = 'https://www.cols-cyclisme.com/pyrenees/liste-r4.htm'
 
 def retrieve_save_details(url_table_page):
     filename = (
@@ -44,13 +44,12 @@ Path("./gpx").mkdir(parents=True, exist_ok=True)
 
 #details_df_old = pd.DataFrame()
 #traces_old = gpd.GeoDataFrame()
-details_df_old = pd.DataFrame()
 details_df = pd.DataFrame()
 traces = gpd.GeoDataFrame()
 
 # Iterate over each row in the DataFrame
 for index, row in details_augmented.iterrows():
-    if pd.notnull(row['id']) # and row['id'] not in details_df_old['url'].tolist():
+    if pd.notnull(row['id']): # and row['id'] not in details_df_old['url'].tolist():
         print(f"{index}, {row['id']}")
         col_url = row['href']
         col_info_df = extract_info_col(col_url, id=index)
