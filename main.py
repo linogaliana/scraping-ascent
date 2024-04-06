@@ -101,6 +101,7 @@ df_max_alt["category"] = pd.cut(
 df_max_alt = df_max_alt.dropna(subset=["category"])
 df_max_alt["category"] = df_max_alt["category"].astype(str)
 df_max_alt = df_max_alt.loc[~df_max_alt['massif'].str.contains('Canada')]
+df_max_alt = df_max_alt.loc[~df_max_alt['massif'].str.contains('(Réunion, France)')]
 df_max_alt.to_file(filename_summits)
 
 
