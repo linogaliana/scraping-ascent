@@ -49,7 +49,7 @@ traces = gpd.GeoDataFrame()
 
 # Iterate over each row in the DataFrame
 for index, row in details_augmented.iterrows():
-    if pd.notnull(row['id']): # and row['id'] not in details_df_old['url'].tolist():
+    if pd.notnull(row['id']):  # and row['id'] not in details_df_old['url'].tolist():
         print(f"{index}, {row['id']}")
         col_url = row['href']
         col_info_df = extract_info_col(col_url, id=index)
